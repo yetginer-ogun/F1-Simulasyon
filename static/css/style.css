@@ -1,0 +1,194 @@
+body { 
+    font-family: Arial, Helvetica, sans-serif; 
+    margin: 20px; 
+    background: #f4f6f8; 
+    color: #222; 
+}
+.container { 
+    max-width: 1100px; 
+    margin: 0 auto; 
+}
+header { 
+    text-align: center; 
+    margin-bottom: 20px; 
+}
+.logo { 
+    display: inline-block; 
+    width: 120px; 
+    height: 120px; 
+    border-radius: 12px; 
+    background: linear-gradient(135deg,#e60000,#ff8a00); 
+    color: white; 
+    font-weight: 700; 
+    font-size: 20px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12); 
+}
+.logo img { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+    border-radius: 12px; 
+}
+h1 { 
+    margin: 10px 0 0; 
+    font-size: 28px; 
+}
+.grid { 
+    display: grid; 
+    grid-template-columns: 1fr 120px 120px 120px 80px; 
+    gap: 8px; 
+    align-items: center; 
+    margin-bottom: 12px; 
+}
+.grid.header { 
+    font-weight: 700; 
+}
+.card { 
+    background: white; 
+    padding: 10px; 
+    border-radius: 8px; 
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06); 
+}
+input[type="text"], input[type="number"] { 
+    width: 100%; 
+    box-sizing: border-box; 
+    padding: 6px; 
+    border: 1px solid #ddd; 
+    border-radius: 6px; 
+}
+.actions { 
+    display: flex; 
+    gap: 10px; 
+    margin: 12px 0 18px; 
+}
+button { 
+    padding: 10px 14px; 
+    border-radius: 8px; 
+    border: none; 
+    cursor: pointer; 
+    font-weight: 600; 
+}
+.btn-save { 
+    background: #1976d2; 
+    color: white; 
+}
+.btn-sim { 
+    background: #2e7d32; 
+    color: white; 
+}
+.btn-add { 
+    background: #556; 
+    color: white; 
+}
+.results { 
+    margin-top: 18px; 
+}
+.result-row { 
+    display: flex; 
+    justify-content: space-between; 
+    padding: 8px 12px; 
+    background: #fff; 
+    border-radius: 6px; 
+    margin-bottom: 6px; 
+}
+.small { 
+    font-size: 13px; 
+    color: #666; 
+}
+.races { 
+    margin-top: 12px; 
+    display: flex; 
+    gap: 8px; 
+    flex-wrap: wrap; 
+}
+.race-item { 
+    background: #fff; 
+    padding: 8px 10px; 
+    border-radius: 8px; 
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04); 
+    display: flex; 
+    gap: 8px; 
+    align-items: center; 
+}
+.footer-note { 
+    font-size: 13px; 
+    color: #666; 
+    margin-top: 18px; 
+    text-align: center; 
+}
+
+
+
+
+
+
+#drivers-area, .header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 0.5fr; 
+    /* Sütun genişlikleri — istersen değiştirebilirsin */
+    align-items: center;
+}
+
+/* Başlık kısmı */
+.header {
+    background-color: #1e293b; /* koyu arkaplan */
+    color: #e2e8f0;
+    font-weight: bold;
+    padding: 12px 0;
+    border-bottom: 2px solid #475569;
+}
+
+/* Veri satırları */
+#drivers-area > div {
+    padding: 10px 6px;
+    border-bottom: 1px solid #334155;
+    background-color: #0f172a;
+    color: #cbd5e1;
+}
+
+/* Satır hover efekti */
+#drivers-area > div:hover {
+    background-color: #1e293b;
+}
+
+/* Grid satırlarının tablo gibi görünmesi için */
+#drivers-area {
+    border-left: 1px solid #334155;
+    border-right: 1px solid #334155;
+    border-bottom: 1px solid #334155;
+}
+
+/* Headere çerçeve */
+.header {
+    border-left: 1px solid #334155;
+    border-right: 1px solid #334155;
+    border-radius: 6px;
+}
+
+#drivers-area > div:nth-child(5n+1) {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+#drivers-area > div:nth-child(5n) {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+
+.delete-btn {
+    background-color: #dc2626;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.delete-btn:hover {
+    background-color: #b91c1c;
+}

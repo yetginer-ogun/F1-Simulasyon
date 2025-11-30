@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <title>F1 Şampiyonluğu Simülasyonu</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="../static/css/style.css">
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="Logo">
+            <img src="logo" alt="Logo">
+        </div>
+        <h1>F1 Şampiyonluk  Simülasyonu</h1>
+        <div class="small">— tabloyu düzenleyip kaydedebilir, ardından simülasyonu çalıştırabilirsiniz-</div>
+    </header>
+
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div><strong>Sürücüler</strong> — adı, puanı ve DNF olasılığını düzenleyin</div>
+            <div style="display:flex; gap:8px;">
+                <form action="{{url_for('api_drivers')}}" method="post">
+                <button class="btn-add" type="submit">Yeni Sürücü Ekle</button></form>
+            </div>
+        </div>
+
+        <div style="margin-top:12px;">
+            <div class="grid header">
+                <div>İsim</div>
+                <div>Puan</div>
+                <div>DNF (0-1)</div>
+                <div style="text-align:center">ID</div>
+                <div></div>
+            </div>
+            <div id="drivers-area">
+                {% if all_data %}
+                    {% for line in all_data %}
+                        {% for a in line %}
+                            {% if loop.last %}
+                                <div style="text-align:center">{{ a }}</div>
+                            {% else %}
+                                <div>{{ a }}</div>
+                            {% endif %}
+                        {% endfor %}
+                        <div style="text-align:center">
+                            <form action="{{ url_for('api_update', id=line[-1]) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="delete-btn">Sil</button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="actions">
+                <form action="{{url_for('api_drivers')}}" method="post">
+                <button class="btn-save" type="submit">Kaydet</button></form>
+                <form action="{{url_for('api_simulate')}}" method="post">
+                <button class="btn-sim" type="submit">Simülasyonu Çalıştır</button></form>
+                <form action="{{url_for('api_reset')}}" method="post">
+                <button type="submit">DB Sıfırla (varsayılanlar)</button></form>
+            </div>
+
+            <div>
+                <strong>Kalan Yarışlar</strong>
+                <div class="races" id="races-area"></div>
+                <div style="margin-top:8px;">
+                    <input id="new-race-name" placeholder="Yarış adı">
+                    <label style="margin-left:6px;">
+                        <input type="checkbox" id="new-race-sprint"> sprint?
+                    </label>
+                    <form action="{{url_for('api_races')}}" method="post">
+                    <button type="submit">Yarış Ekle</button></form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="results card" id="results" style="display:none;">
+        <h3>Simülasyon Sonuçları</h3>
+        <div id="results-list"></div>
+    </div>
+
+    <div class="footer-note">
+        Not: Simülasyon rastgelelik içerir. Simülasyon sayısı ve DNF olasılıklarına göre sonuçlar değişir.
+    </div>
+</div>
+
+</body>
+</html>
