@@ -92,6 +92,9 @@ class F1db:
         self.c.execute('DELETE FROM drivers WHERE driver_id=?', (driver_id,))
         self.conn.commit()
 
+    def delete_race(self, index):
+        self.c.execute('DELETE FROM remaining_races WHERE race_name=?', (index,))
+        self.conn.commit()
 
     def get_all_drivers(self):
         self.c.execute("SELECT name, current_points, dnf_prob, driver_id FROM drivers")

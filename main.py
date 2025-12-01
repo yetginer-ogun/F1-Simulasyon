@@ -16,6 +16,10 @@ def index():
         return render_template('index.html',all_data=all_data,races_names=races_names, probabilities = probabilities)
     return render_template('index.html',all_data=all_data,races_names=races_names)
 
+@app.post("/delete_race/<index>")
+def delete_race(index):
+    db.delete_race(index)
+    return redirect("/")
 
 @app.route('/api_update/<int:id>', methods=['POST'])
 def api_update(id):

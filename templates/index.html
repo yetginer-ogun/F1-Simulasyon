@@ -85,13 +85,18 @@
             <strong>Kalan Yarışlar</strong>
             <div class="races" id="races-area">
                 {% if races_names %}
-                    <ol>
-                        {% for item in races_names %}
-                            <li>{{ item[0] }}</li>
-                        {% endfor %}
-                    </ol>
+                <ol>
+                    {% for item in races_names %}
+                    <li>
+                        {{ item[0] }}
+                        <form action="/delete_race/{{ item[0] }}" method="POST" style="display:inline;">
+                        <button type="submit">Sil</button>
+                        </form>
+                    </li>
+                    {% endfor %}
+                </ol>
                 {% endif %}
-            </div>
+            </div> 
         </div>
 
             <!-- Yarış ekleme formu (inputs artık form içinde ve name'leri var) -->
