@@ -1,1 +1,1 @@
-Şu an sil ve DB Sıfırla butonları çalışıyor
+Şu an sil, DB Sıfırla, simülasyon çalıştır butonları çalışıyor
