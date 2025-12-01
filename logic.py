@@ -82,30 +82,14 @@ class F1db:
         )
         self.conn.commit()
 
-    def upsert_driver(self, driver_id, name, points, dnf_prob):
-        if driver_id is not None:
-            self.c.execute(
-                'UPDATE drivers SET name=?, current_points=?, dnf_prob=? WHERE driver_id=?',
-                (name, int(points), float(dnf_prob), int(driver_id))
-            )
-        else:
-            self.c.execute(
-                'INSERT OR REPLACE INTO drivers(name, current_points, dnf_prob) VALUES (?, ?, ?)',
-                (name, int(points), float(dnf_prob))
-            )
+    def add_driver(self, name, points, dnf_prob):
+        self.c.execute(
+                'INSERT INTO drivers(name, current_points, dnf_prob) VALUES (?, ?, ?)',
+                (name, int(points), float(dnf_prob)))
         self.conn.commit()
 
     def delete_driver(self, driver_id):
         self.c.execute('DELETE FROM drivers WHERE driver_id=?', (driver_id,))
-        self.conn.commit()
-
-    def upsert_race(self, race_id, name, is_sprint):
-        if race_id is not None:
-            self.c.execute('UPDATE remaining_races SET race_name=?, is_sprint=? WHERE race_id=?',
-                           (name, int(bool(is_sprint)), int(race_id)))
-        else:
-            self.c.execute('INSERT OR REPLACE INTO remaining_races(race_name, is_sprint) VALUES (?, ?)',
-                           (name, int(bool(is_sprint))))
         self.conn.commit()
 
 
@@ -142,23 +126,19 @@ def monte_carlo_championship(drivers, races, num_simulations=5000):
     points_standard = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1]
     points_sprint   = [8, 7, 6, 5, 4, 3, 2, 1]
 
-    # İsimleri ve temel değerleri tuple'lardan çekiyoruz
     names      = [d[0] for d in drivers]          # name
     base_points = {d[0]: int(d[1]) for d in drivers}   # points
     dnf_probs   = {d[0]: float(d[2]) for d in drivers} # dnf_prob
-    # driver_id (d[3]) şu an simülasyonda kullanılmıyor, istersen ek mantıkta kullanabilirsin
+
 
     champion_count = {name: 0 for name in names}
 
     for _ in range(num_simulations):
         pts = base_points.copy()
-
-        # races: (race_id, race_name, is_sprint)
         for r in races:
             race_id, race_name, is_sprint_flag = r
             is_sprint = bool(is_sprint_flag)
 
-            # DNF olmayan sürücüler
             eligible = [n for n in names if random.random() > dnf_probs[n]]
             if not eligible:
                 continue
@@ -176,5 +156,4 @@ def monte_carlo_championship(drivers, races, num_simulations=5000):
         champion = random.choice(leaders) if len(leaders) > 1 else leaders[0]
         champion_count[champion] += 1
 
-    # Olasılıkları döndür
     return {name: champion_count[name] / num_simulations for name in names}
