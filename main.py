@@ -1,14 +1,20 @@
-from flask import Flask, request, jsonify, render_template,redirect,url_for
+from flask import Flask, request, jsonify, render_template,redirect,url_for,session
 from logic import F1db, monte_carlo_championship
 import os
 import time
 import random
 app = Flask(__name__)
+app.secret_key = "f1"
 db = F1db()
 
 @app.route('/')
 def index():
-    all_data = db.get_all_data()
+    all_data = db.get_all_drivers()
+    for x in all_data:
+        print(x)
+    probabilities = session.pop('probabilities', None)
+    if probabilities:
+        return render_template('index.html',all_data=all_data, probabilities = probabilities)
     return render_template('index.html',all_data=all_data)
 
 
@@ -57,9 +63,15 @@ def api_races():
 
 @app.route('/api/simulate', methods=['POST'])
 def api_simulate():
-    data = request.get_json() or {}
-    num = int(data.get('num_simulations',10000))
-    return jsonify({'status':'ok','probabilities':monte_carlo_championship(db.get_drivers(), db.get_remaining_races(), num_simulations=num)})
+    data = db.get_all_drivers()
+    races = db.get_all_races()
+
+    print("Drivers:", data)
+    print("Races:", races)
+
+    probabilities = monte_carlo_championship(data,races)
+    session['probabilities'] = probabilities
+    return redirect("/")
 
 @app.route('/api/reset', methods=['POST'])
 def api_reset():

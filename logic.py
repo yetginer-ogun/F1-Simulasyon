@@ -82,11 +82,6 @@ class F1db:
         )
         self.conn.commit()
 
-    def get_drivers(self):
-        self.c.execute('SELECT driver_id, name, current_points, dnf_prob FROM drivers ORDER BY current_points DESC')
-        rows = self.c.fetchall()
-        return [{'id': r[0], 'name': r[1], 'points': r[2], 'dnf_prob': float(r[3] or 0.0)} for r in rows]
-
     def upsert_driver(self, driver_id, name, points, dnf_prob):
         if driver_id is not None:
             self.c.execute(
@@ -119,9 +114,15 @@ class F1db:
         self.conn.commit()
 
 
-    def get_all_data(self):
-        a = self.c.execute("SELECT name,current_points,dnf_prob,driver_id FROM drivers")
-        return a
+    def get_all_drivers(self):
+        self.c.execute("SELECT name, current_points, dnf_prob, driver_id FROM drivers")
+        rows = self.c.fetchall()
+        return rows
+    
+    def get_all_races(self):
+        self.c.execute("SELECT * FROM remaining_races")
+        rows = self.c.fetchall()
+        return rows
     
     def reset_data(self):
         self.c.execute("DROP TABLE IF EXISTS drivers")
@@ -135,31 +136,46 @@ class F1db:
 
 
 def monte_carlo_championship(drivers, races, num_simulations=5000):
+    """
+    drivers: list of tuples -> (name, points, dnf_prob, driver_id)
+    races:   list of tuples -> (race_id, race_name, is_sprint)
+    """
     points_standard = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1]
-    points_sprint = [8,7,6,5,4,3,2,1]
+    points_sprint   = [8, 7, 6, 5, 4, 3, 2, 1]
 
-    names = [d['name'] for d in drivers]
-    base_points = {d['name']: int(d['points']) for d in drivers}
-    dnf_probs = {d['name']: float(d.get('dnf_prob') or 0.0) for d in drivers}
-    race_defs = races
+    # İsimleri ve temel değerleri tuple'lardan çekiyoruz
+    names      = [d[0] for d in drivers]          # name
+    base_points = {d[0]: int(d[1]) for d in drivers}   # points
+    dnf_probs   = {d[0]: float(d[2]) for d in drivers} # dnf_prob
+    # driver_id (d[3]) şu an simülasyonda kullanılmıyor, istersen ek mantıkta kullanabilirsin
 
     champion_count = {name: 0 for name in names}
 
     for _ in range(num_simulations):
         pts = base_points.copy()
-        for r in race_defs:
-            is_sprint = bool(r.get('is_sprint', False))
+
+        # races: (race_id, race_name, is_sprint)
+        for r in races:
+            race_id, race_name, is_sprint_flag = r
+            is_sprint = bool(is_sprint_flag)
+
+            # DNF olmayan sürücüler
             eligible = [n for n in names if random.random() > dnf_probs[n]]
             if not eligible:
                 continue
+
             random.shuffle(eligible)
             points_awarded = points_sprint if is_sprint else points_standard
+
             for pos, driver in enumerate(eligible):
                 if pos < len(points_awarded):
                     pts[driver] += points_awarded[pos]
+
         max_points = max(pts.values())
-        leaders = [n for n,p in pts.items() if p==max_points]
-        champion = random.choice(leaders) if len(leaders)>1 else leaders[0]
+        leaders = [n for n, p in pts.items() if p == max_points]
+
+        champion = random.choice(leaders) if len(leaders) > 1 else leaders[0]
         champion_count[champion] += 1
 
+    # Olasılıkları döndür
     return {name: champion_count[name] / num_simulations for name in names}
