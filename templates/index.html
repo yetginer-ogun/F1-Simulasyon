@@ -44,7 +44,6 @@
 
             <div id="drivers-area">
                 {% if all_data %}
-                    {# all_data elemanları: (isim, puan, dnf, id) varsayıyorum #}
                     {% for name, points, dnf, driver_id in all_data %}
                         <div class="driver-row">
                             <div>{{ name }}</div>
@@ -80,21 +79,28 @@
         <div>
             <strong>Kalan Yarışlar</strong>
             <div class="races" id="races-area">
-                {# Yarışları server-side göstereceksen burada listeleyebilirsin #}
+                {% if races_names %}
+                    <ol>
+                        {% for item in races_names %}
+                            <li>{{ item[0] }}</li>
+                        {% endfor %}
+                    </ol>
+                {% endif %}
             </div>
+        </div>
 
             <!-- Yarış ekleme formu (inputs artık form içinde ve name'leri var) -->
             <form action="{{ url_for('api_races') }}" method="post" class="race-form">
                 <input
                     type="text"
                     name="race_name"
-                    id="new-race-name"
+                    id="race_name"
                     placeholder="Yarış adı">
                 <label>
                     <input
                         type="checkbox"
                         name="is_sprint"
-                        id="new-race-sprint">
+                        id="is_sprint">
                     sprint?
                 </label>
                 <button type="submit">Yarış Ekle</button>

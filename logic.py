@@ -99,11 +99,6 @@ class F1db:
         self.c.execute('DELETE FROM drivers WHERE driver_id=?', (driver_id,))
         self.conn.commit()
 
-    def get_remaining_races(self):
-        self.c.execute('SELECT race_id, race_name, is_sprint FROM remaining_races ORDER BY race_id')
-        rows = self.c.fetchall()
-        return [{'id': r[0], 'name': r[1], 'is_sprint': bool(r[2])} for r in rows]
-
     def upsert_race(self, race_id, name, is_sprint):
         if race_id is not None:
             self.c.execute('UPDATE remaining_races SET race_name=?, is_sprint=? WHERE race_id=?',
@@ -124,22 +119,26 @@ class F1db:
         rows = self.c.fetchall()
         return rows
     
+    def get_all_races_names(self):
+        self.c.execute("SELECT race_name FROM remaining_races")
+        rows = self.c.fetchall()
+        return rows
+    
     def reset_data(self):
         self.c.execute("DROP TABLE IF EXISTS drivers")
         self.c.execute("DROP TABLE IF EXISTS remaining_races")
         self.create_tables()
         self.default_insert()
 
+    def add_race(self,name,sprint):
+        self.c.execute("INSERT INTO remaining_races(race_name, is_sprint) VALUES (?, ?)",(name, int(bool(sprint))))
+        self.conn.commit()
 
     def close(self):
         self.conn.close()
 
 
 def monte_carlo_championship(drivers, races, num_simulations=5000):
-    """
-    drivers: list of tuples -> (name, points, dnf_prob, driver_id)
-    races:   list of tuples -> (race_id, race_name, is_sprint)
-    """
     points_standard = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1]
     points_sprint   = [8, 7, 6, 5, 4, 3, 2, 1]
 

@@ -10,21 +10,18 @@ db = F1db()
 @app.route('/')
 def index():
     all_data = db.get_all_drivers()
-    for x in all_data:
-        print(x)
+    races_names = db.get_all_races_names()
+    print(races_names)
     probabilities = session.pop('probabilities', None)
     if probabilities:
-        return render_template('index.html',all_data=all_data, probabilities = probabilities)
-    return render_template('index.html',all_data=all_data)
+        return render_template('index.html',all_data=all_data,races_names=races_names, probabilities = probabilities)
+    return render_template('index.html',all_data=all_data,races_names=races_names)
 
 
 @app.route('/api_update/<int:id>', methods=['POST'])
 def api_update(id):
-    # buraya silme işlemini yazacaksın
     print("Silinecek ID:", id)
     db.delete_driver(id)
-
-    # işlem bittikten sonra tekrar liste sayfasına dön
     return redirect(url_for('index'))
 
 @app.route('/api/drivers', methods=['GET','POST'])
@@ -45,30 +42,19 @@ def api_drivers():
                 db.delete_driver(ex['id'])
         return jsonify({'status':'ok','message':'Sürücüler güncellendi'})
 
-@app.route('/api/races', methods=['GET','POST','DELETE'])
+@app.route('/api/races', methods=['POST'])
 def api_races():
-    if request.method == 'GET':
-        return jsonify(db.get_remaining_races())
-    elif request.method == 'POST':
-        data = request.get_json() or {}
-        db.upsert_race(None, data.get('name','').strip(), bool(data.get('is_sprint', False)))
-        return jsonify({'status':'ok'})
-    else:
-        data = request.get_json() or {}
-        rid = data.get('id')
-        if rid:
-            db.c.execute('DELETE FROM remaining_races WHERE race_id=?',(int(rid),))
-            db.conn.commit()
-        return jsonify({'status':'ok'})
+    race_name = request.form.get("race_name")
+    sprint = request.form.get("is_sprint")
+    print("race name")
+    print("sprint")
+    db.add_race(race_name,sprint)
+    return redirect("/")
 
 @app.route('/api/simulate', methods=['POST'])
 def api_simulate():
     data = db.get_all_drivers()
     races = db.get_all_races()
-
-    print("Drivers:", data)
-    print("Races:", races)
-
     probabilities = monte_carlo_championship(data,races)
     session['probabilities'] = probabilities
     return redirect("/")
